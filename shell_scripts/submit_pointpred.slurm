@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=FI-SAA-job         # 作业名称
-#SBATCH --output=log/main_out_%A_%a.txt   # 输出文件，%A 为作业 ID，%a 为数组索引
+#SBATCH --output=/dev/null # log/main_out_%A_%a.txt   # 输出文件，%A 为作业 ID，%a 为数组索引
 #SBATCH --error=log/main_err_%A_%a.txt    # 错误文件
 #SBATCH --cpus-per-task=4             # 每任务 CPU 核心数
 #SBATCH --time=0-12:00:00             # 最大运行时间（12小时，需根据任务调整）
@@ -38,4 +38,4 @@ if [ ${#PARAMS[@]} -ne 4 ]; then
 fi
 
 # 运行 Bash 脚本，传递参数
-./pointpred.sh ${PARAMS[0]} ${PARAMS[1]} ${PARAMS[2]} ${PARAMS[3]}
+./shell_pointpred.sh ${PARAMS[0]} ${PARAMS[1]} ${PARAMS[2]} ${PARAMS[3]}
