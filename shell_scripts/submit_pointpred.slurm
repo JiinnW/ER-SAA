@@ -16,7 +16,7 @@ fi
 
 
 # 从 instances_case1.txt 读取参数
-INPUT_FILE="../instances/instances_case1.txt"
+INPUT_FILE="../instances/instances_case2.txt"
 TOTAL_LINES=$(wc -l < "$INPUT_FILE")
 TASK_ID=$SLURM_ARRAY_TASK_ID
 
