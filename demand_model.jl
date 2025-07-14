@@ -1,3 +1,5 @@
+using LinearAlgebra
+
 # Generate random demand and covariate data for the resource allocation model
 
 
@@ -7,7 +9,7 @@ function generateRandomCorrMat(dim::Int64)
 	betaparam::Float64 = 2.0
 
 	partCorr = zeros(Float64,dim,dim)
-	corrMat = eye(dim)
+	corrMat = Matrix{Float64}(I, dim, dim)
 
 	for k = 1:dim-1
 		for i = k+1:dim
@@ -34,12 +36,12 @@ function generateBaseDemandModel(numCovariates::Int64)
 	# generate parameters for the covariate distribution
 	covariate_mean = zeros(Float64, maxNumCovariates)
 	covariate_corrMat = generateRandomCorrMat(maxNumCovariates)
-	covariate_covMat = covariate_corrMat + 1E-09*eye(maxNumCovariates)
+	covariate_covMat = covariate_corrMat + 1E-09*I(maxNumCovariates)
 	# covariate realizations for estimating scaling coefficients
 	covariate_tmp = rand(Normal(),maxNumCovariates,maxNumDataSamples)
 
 	# generate coefficients for the dependence of the demands on the covariates
-	alpha = 50.0 + 5.0*rand(Normal(), numCustomers)
+	alpha = 50.0 .+ 5.0.*rand(Normal(), numCustomers)
 	beta = repeat([10.0,5.0,2.0],outer=[1,numCustomers])' + rand(Uniform(-4.0,4.0), numCustomers, 3)
 	
 	if(numCovariates < 3)
@@ -61,7 +63,7 @@ function generateBaseDemandModel(numCovariates::Int64)
 	# estimate scaling coefficients
 	covariate_mean_case = covariate_mean[1:numCovariates]
 	covariate_covMat_case = covariate_covMat[1:numCovariates,1:numCovariates]
-	covariate_covMat_chol = (cholfact(Hermitian(covariate_covMat_case)))[:L]
+	covariate_covMat_chol = (cholesky(Hermitian(covariate_covMat_case))).L
 	
 	covariate_data = zeros(Float64, maxNumDataSamples, numCovariates+1)
 	covariate_data[:,1] = ones(Float64,maxNumDataSamples)
@@ -86,7 +88,7 @@ function generateDemandData(numCovariates::Int64,numSamples::Int64,degree::Float
 
 	covariate_mean_case = covariate_mean[1:numCovariates]
 	covariate_covMat_case = covariate_covMat[1:numCovariates,1:numCovariates]
-	covariate_covMat_chol = (cholfact(Hermitian(covariate_covMat_case)))[:L]
+	covariate_covMat_chol = (cholesky(Hermitian(covariate_covMat_case))).L
 
 	#*===========================================
 	# first, construct the the covariates	
@@ -122,7 +124,7 @@ function generateCovariateReal(numCovariates::Int64,covariate_mean::Array{Float6
 
 	covariate_mean_case = covariate_mean[1:numCovariates]
 	covariate_covMat_case = covariate_covMat[1:numCovariates,1:numCovariates]
-	covariate_covMat_chol = (cholfact(Hermitian(covariate_covMat_case)))[:L]
+	covariate_covMat_chol = (cholesky(Hermitian(covariate_covMat_case))).L
 
 	covariate_tmp = rand(Normal(),maxNumCovariates)
 	covariate_obs = ones(Float64, numCovariates+1)

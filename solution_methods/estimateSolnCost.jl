@@ -3,7 +3,9 @@
 # given decisions and scenarios of the demands, estimate the objective cost
 function estimateCostOfSoln(z_soln::Array{Float64},demand_scen::Array{Float64,2})
 	
-	mod = Model(solver=GurobiSolver(gurobi_env,Presolve=0,OutputFlag=0,Threads=maxNumThreads))
+	mod = Model(() -> Gurobi.Optimizer(gurobi_env))
+	set_optimizer_attribute(mod, "OutputFlag", 0)
+	set_optimizer_attribute(mod, "Threads", maxNumThreads)
 
 	@variable(mod, v[1:numResources,1:numCustomers] >= 0)
 	@variable(mod, w[1:numCustomers] >= 0)
@@ -23,8 +25,8 @@ function estimateCostOfSoln(z_soln::Array{Float64},demand_scen::Array{Float64,2}
 			JuMP.setRHS(con1[j],demand_scen[s,j])
 		end
 
-		status = solve(mod)
-		solnCost += getobjectivevalue(mod)
+		status = optimize!(mod)
+		solnCost += objective_value(mod)
 	end
 	
 	solnCost /= numScenarios

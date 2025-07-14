@@ -8,23 +8,23 @@ const gurobi_env = Gurobi.Env()
 
 
 # read these as inputs from the corresponding "instance file"
-modRepNum = parse(ARGS[1])
-degNum = parse(ARGS[2])
-dataRepNum = parse(ARGS[3])
-sampSizeNum = parse(ARGS[4])
+modRepNum = parse(Int, ARGS[1])
+degNum = parse(Int, ARGS[2])
+dataRepNum = parse(Int, ARGS[3])
+sampSizeNum = parse(Int, ARGS[4])
 
 
 
 #*========= MODEL INFORMATION ==========
 const caseNum = 1
-const paramsFile = "params_case" * string(caseNum) * "_pointpred.jl"
+const paramsFile = "../parameter_settings/params_case" * string(caseNum) * "_pointpred.jl"
 #*======================================
 
 
 
 #*========= INCLUDE FILES ====================
-include("maxParameters.jl")
-include("randomSeeds.jl")
+include("../maxParameters.jl")
+include("../randomSeeds.jl")
 
 include(paramsFile)
 # the next two data files are defined in paramsFile
@@ -33,7 +33,7 @@ include(dataFile)
 
 include("regressionMethods.jl")
 include("genPointPred.jl")
-include("solveModel.jl")
+include("../solution_methods/solveModel.jl")
 include("estimateSolnCost.jl")
 include("evaluateSoln.jl")
 #*======================================
@@ -41,7 +41,7 @@ include("evaluateSoln.jl")
 
 
 # set seed for reproducibility
-srand(startingSeed)
+Random.seed!(startingSeed)
 
 
 
@@ -54,7 +54,7 @@ mkpath(subDirName2)
 
 
 #*========= PRINT OPTIONS ====================
-const storeResults = true
+const storeResults = false
 
 const infoFile = "ddsp.txt"
 const modelDataFile = "model_data.txt"
@@ -71,7 +71,7 @@ const covRealFile = "covariate_obs.txt"
 
 #*========= GENERATE MODEL PARAMETERS ====================
 	
-srand(randomSeeds_models[modRepNum])
+Random.seed!(randomSeeds_models[modRepNum])
 
 covariate_mean, covariate_covMat, coeff_true, var_coeff_true, var_coeff_scaling = generateBaseDemandModel(numCovariates)
 
@@ -120,7 +120,7 @@ end
 
 #*========= GENERATE DATA REPLICATE ====================
 
-srand(randomSeeds_data[dataRepNum])
+Random.seed!(randomSeeds_data[dataRepNum])
 
 covariate_obs = generateCovariateReal(numCovariates,covariate_mean,covariate_covMat)
 
@@ -142,7 +142,7 @@ end
 
 #*========= SOLVE POINT PREDICTION-BASED MODEL ====================
 
-tic()
+nominalTime = @elapsed begin
 
 
 demand_scen_nominal = generatePointPrediction(demand_data,covariate_data,covariate_obs,regressionMethod)
@@ -152,7 +152,7 @@ z_soln_nominal, objDDNominal = solveSAAModel(demand_scen_nominal)
 nominalObjEstimates = estimateSolnQuality(z_soln_nominal,covariate_obs,degree[degNum],numMCScenarios,numMCReplicates,coeff_true,var_coeff_true,var_coeff_scaling)
 
 
-nominalTime = toq()
+end
 
 
 #*========= STORE RESULTS ====================

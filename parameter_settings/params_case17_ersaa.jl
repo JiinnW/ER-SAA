@@ -1,8 +1,8 @@
 # parameters for ER-SAA + OLS with heteroscedasticity estimation with d_x = 10 and omega = 3
 
 # model and data generation files
-const modelFile = "resource_20_30.jl"
-const dataFile = "demand_model.jl"
+const modelFile = "../resource_20_30.jl"
+const dataFile = "../demand_model.jl"
 
 # parameters for estimating the true optimal objective value using MC sampling
 const numMCScenarios = 1000

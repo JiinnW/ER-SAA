@@ -3,7 +3,9 @@ function solveSAAModel(demand_scen::Array{Float64,2})
 
 	numScenarios::Int64 = size(demand_scen,1)
 	
-	mod = Model(solver=GurobiSolver(gurobi_env,Presolve=0,OutputFlag=0,Threads=maxNumThreads))
+	mod = Model(() -> Gurobi.Optimizer(gurobi_env))
+	set_optimizer_attribute(mod, "OutputFlag", 0)
+	set_optimizer_attribute(mod, "Threads", maxNumThreads)
 
 	@variable(mod, z[1:numResources] >= 0)
 	@variable(mod, v[1:numResources,1:numCustomers,1:numScenarios] >= 0)
@@ -16,9 +18,9 @@ function solveSAAModel(demand_scen::Array{Float64,2})
 	@constraint(mod, [j=1:numCustomers, s=1:numScenarios], sum(mu[i,j]*v[i,j,s] for i = 1:numResources) + w[j,s] >= demand_scen[s,j])
 
 	
-	status = solve(mod)
-	z_soln = getvalue(z)
-	objValue_soln::Float64 = getobjectivevalue(mod)
+	status = optimize!(mod)
+	z_soln = value.(z)
+	objValue_soln::Float64 = objective_value(mod)
 	
 	return z_soln, objValue_soln
 end

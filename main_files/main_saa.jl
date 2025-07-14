@@ -9,36 +9,36 @@ const gurobi_env = Gurobi.Env()
 
 
 # read these as inputs from the corresponding "instance file"
-modRepNum = parse(ARGS[1])
-degNum = parse(ARGS[2])
-dataRepNum = parse(ARGS[3])
-saaRepNum = parse(ARGS[4])
+modRepNum = parse(Int, ARGS[1])
+degNum = parse(Int, ARGS[2])
+dataRepNum = parse(Int, ARGS[3])
+saaRepNum = parse(Int, ARGS[4])
 
 
 
 #*========= MODEL INFORMATION ==========
 const caseNum = 1
-const paramsFile = "params_case" * string(caseNum) * "_saa.jl"
+const paramsFile = "../parameter_settings/params_case" * string(caseNum) * "_saa.jl"
 #*======================================
 
 
 
 #*========= INCLUDE FILES ====================
-include("maxParameters.jl")
-include("randomSeeds.jl")
+include("../maxParameters.jl")
+include("../randomSeeds.jl")
 
 include(paramsFile)
 # the next two data files are defined in paramsFile
 include(modelFile)
 include(dataFile)
 
-include("solveModel.jl")
+include("../solution_methods/solveModel.jl")
 #*======================================
 
 
 
 # set seed for reproducibility
-srand(startingSeed)
+Random.seed!(startingSeed)
 
 
 
@@ -51,7 +51,7 @@ mkpath(subDirName2)
 
 
 #*========= PRINT OPTIONS ====================
-const storeResults = true
+const storeResults = false
 
 const infoFile = "ddsp.txt"
 const modelDataFile = "model_data.txt"
@@ -65,7 +65,7 @@ const covRealFile = "covariate_obs.txt"
 
 #*========= GENERATE MODEL PARAMETERS ====================
 	
-srand(randomSeeds_models[modRepNum])	
+Random.seed!(randomSeeds_models[modRepNum])	
 numCovariates = 3
 
 covariate_mean, covariate_covMat, coeff_true, var_coeff_true, var_coeff_scaling = generateBaseDemandModel(numCovariates)
@@ -107,7 +107,7 @@ end
 
 #*========= GENERATE DATA REPLICATE ====================
 
-srand(randomSeeds_data[dataRepNum])
+Random.seed!(randomSeeds_data[dataRepNum])
 
 covariate_obs = generateCovariateReal(numCovariates,covariate_mean,covariate_covMat)
 
@@ -127,19 +127,19 @@ end
 
 #*========= SOLVE THE FULL-INFORMATION SAA MODEL ====================
 
-tic()
+SAATime = @elapsed begin
 
 
 # create scenarios from the true conditional distribution
-srand(randomSeeds_MC[saaRepNum])
+Random.seed!(randomSeeds_MC[saaRepNum])
 
 demand_scen_MC = generateTrueCondScenarios(numMCScenarios,covariate_obs,degree[degNum],coeff_true,var_coeff_true,var_coeff_scaling)
 
 # solve SAA problems to estimate true objective value at this conditioning
-~, SAAObj = solveSAAModel(demand_scen_MC)
+_, SAAObj = solveSAAModel(demand_scen_MC)
 
 
-SAATime = toq()
+end
 
 
 #*========= STORE RESULTS ====================

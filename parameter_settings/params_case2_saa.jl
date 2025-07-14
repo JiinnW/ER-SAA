@@ -1,8 +1,8 @@
 # parameters for the Full Information SAA (FI-SAA) problem with 1000 scenarios
 
 # model and data generation files
-const modelFile = "resource_20_30.jl"
-const dataFile = "demand_model.jl"
+const modelFile = "../resource_20_30.jl"
+const dataFile = "../demand_model.jl"
 
 # parameters for estimating the true optimal objective value using SAA
 const numMCScenarios = 1000
