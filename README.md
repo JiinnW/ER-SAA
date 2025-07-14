@@ -1,2 +1,2 @@
 - Modified from the original code https://github.com/rohitkannan/DD-SAA
-- Runnable with the latest version of Julia
+- Runnable with Julia 1.11.5
