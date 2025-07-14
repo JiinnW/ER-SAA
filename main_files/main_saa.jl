@@ -43,11 +43,7 @@ Random.seed!(startingSeed)
 
 
 # directory name for storing results
-<<<<<<< HEAD
 const baseDirName = "../output/case" * string(caseNum) * "_saa/" * "mod_" * string(modRepNum) * "/" * "deg_" * string(degNum) * "/"
-=======
-const baseDirName = "case" * string(caseNum) * "_saa/" * "mod_" * string(modRepNum) * "/" * "deg_" * string(degNum) * "/"
->>>>>>> 1b8ef5ad9b3efd57ea13e3c9dd95c8b42a5d2191
 const subDirName = baseDirName * "rep_" * string(dataRepNum) * "/"
 const subDirName2 = subDirName * "saa_" * string(saaRepNum) * "/"
 mkpath(subDirName2)
@@ -147,11 +143,7 @@ end
 
 
 #*========= STORE RESULTS ====================
-<<<<<<< HEAD
 if(true)
-=======
-if(storeResults)
->>>>>>> 1b8ef5ad9b3efd57ea13e3c9dd95c8b42a5d2191
 	
 	# write data to text file
 	obj_est_file = subDirName2 * saaObjFile
